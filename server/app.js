@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const connectDB = require('./db');
 
+//DB CONNECTION
 connectDB();
 //Middleware
 
