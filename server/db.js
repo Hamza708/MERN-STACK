@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 
-const DB_URI =
-  'mongodb+srv://hamza:qwerty123@cluster0.lxtq6ui.mongodb.net/mernstack?retryWrites=true&w=majority';
+dotenv.config({ path: './config.env' });
+const DB_URI = process.env.DATABASE;
 mongoose.set('strictQuery', true);
 const connectDB = async () => {
   try {

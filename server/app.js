@@ -1,9 +1,15 @@
+const dotenv = require('dotenv');
 const express = require('express');
 const app = express();
 const connectDB = require('./db');
 
+const PORT = process.env.PORT;
 //DB CONNECTION
 connectDB();
+app.use(express.json());
+// const User = require('./model/userSchema');
+app.use(require('./router/auth'));
+
 //Middleware
 
 const middleware = (req, res, next) => {
@@ -12,7 +18,7 @@ const middleware = (req, res, next) => {
 };
 
 app.get('/', (req, res) => {
-  res.send('Hello World');
+  res.send('Hello Worldd');
 });
 app.get('/about', middleware, (req, res) => {
   res.send('About ');
@@ -27,6 +33,6 @@ app.get('/signup', (req, res) => {
   res.send('Signup');
 });
 
-app.listen(3000, () => {
-  console.log('running');
+app.listen(PORT, () => {
+  console.log(`running on port ${PORT}`);
 });
