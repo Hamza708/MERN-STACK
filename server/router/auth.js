@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const router = express.Router();
 require('../db');
 
@@ -46,27 +47,37 @@ router.post('/register', async (req, res) => {
     const userExist = await User.findOne({ email: email });
     if (userExist) {
       return res.status(422).json({ error: 'email already exist' });
-    }
-    const user = new User({ name, email, phone, work, password, cpassword });
+    } else if (password != cpassword) {
+      return res.status(422).json({ error: 'password not matching' });
+    } else {
+      const user = new User({ name, email, phone, work, password, cpassword });
 
-    const register = user.save();
-    res.status(201).json({ message: 'user successfully registred' });
+      user.save();
+      res.status(201).json({ message: 'user successfully registred' });
+    }
   } catch (err) {
     console.log(err);
   }
 });
-router.post('/signin', async (req, res) => {
-  const { email, name } = req.body;
-  if ((!email, !name)) {
-    return res.status(422).json({ error: 'please fill all input' });
-  }
-  try {
-    const userLogin = await User.findOne({ email, name });
 
-    if (!userLogin) {
-      res.json({ message: 'Signin falied' });
+router.post('/signin', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: 'please fill all input' });
+    }
+
+    const userLogin = await User.findOne({ email: email });
+    if (userLogin) {
+      const isMatch = await bcrypt.compare(password, userLogin.password);
+
+      if (!isMatch) {
+        res.json({ message: 'Signin falied' });
+      } else {
+        res.json({ message: 'user signin successfully', userLogin });
+      }
     } else {
-      res.json({ message: 'user signin successfully', userLogin });
+      res.json({ message: 'Invalid credentials', userLogin });
     }
   } catch (err) {
     console.log(err);
